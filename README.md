@@ -24,15 +24,15 @@ Use `-f` or `--format` to change the formatting of individual highlights. Curren
 
 | Format | Example |
 | ---  | --- |
-| `bullet` | - Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024 7:24:44 PM, Page 8) |
-| `quote` | > Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024 7:24:44 PM, Page 8) |
-| `paragraph` | Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024 7:24:44 PM, Page 8) |
+| `bullet` | - Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024 - Page 8) |
+| `quote` | > Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024 - Page 8) |
+| `paragraph` | Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024 - Page 8) |
 
 ### Add date
 
 Use `-d` or `--date` to add the date the highlight was created to the output of each highlight.
 
-Example: `Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024 7:24:44 PM)`
+Example: `Writers can profit by reading more than one style guide, and much of Strunk and White (as it is commonly called) is as timeless as it is charming. But much of it is not. (Added on Friday, March 22, 2024)`
 
 ### Add page
 

@@ -72,11 +72,12 @@ class Highlight:
         title = author_line[: match.start()]
 
         # Parse additional info
-        date = details[-1][10:]
+        date_pieces = details[-1][10:].split(" ")
+        date = " ".join(date_pieces[:4])
         page_idx = details[0].strip().find("page")
         page = "P" + details[0][page_idx + 1 : -1]
 
-        return title, author, content, page, date
+        return title, author, content, date, page
 
 
 class Formatting(Enum):
@@ -123,7 +124,7 @@ class Formatting(Enum):
 
         if add_date and add_page:
             formatted_text = (
-                f"{formatted_text} (Added on {highlight.date}, {highlight.page})"
+                f"{formatted_text} (Added on {highlight.date} - {highlight.page})"
             )
         elif add_date and not add_page:
             formatted_text = f"{formatted_text} (Added on {highlight.date})"
