@@ -18,6 +18,8 @@ SAVE_PATH = "books/"  # Where to save the markdown files. The default is a folde
 
 
 class Highlight:
+    """Stores parsed information about a single highlight."""
+
     def __init__(self, raw_string: str):
         (
             self.title,
@@ -53,21 +55,16 @@ class Highlight:
 
         if len(split_string) != 3:
             return "", "", "", "", ""
-            # return None, None, None, None, None
 
-        # first parse
         author_line = split_string[0]
         content = split_string[-1]
         details = split_string[-2].split("|")
 
-        # parse author and title
+        # Parse author and title
         regex = r"\((.*?)\)"
         match = re.search(regex, author_line)
-
         if not match:
             return "", "", "", "", ""
-            # return None, None, None, None, None
-
         author = match.group(1)
         title = author_line[: match.start()]
 
