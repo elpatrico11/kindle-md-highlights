@@ -1,0 +1,7 @@
+.DS_Store
+# Ignore personal clippings.
+books/
+My\ Clippings.txt
+# Do not ignore the example directory.
+!example/**/books/
+!example/**/My Clippings.txt
