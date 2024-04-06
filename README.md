@@ -48,8 +48,7 @@ If you do not like `books/` as the directory for your Markdown notes, you can pa
 
 By default the script will skip files that already exists. 
 
-> ![NOTE]
-> If you added new highlights to an existing file, they will not be added by default.
+>[!NOTE] If you added new highlights to an existing file, they will not be added by default.
 
 You can overwrite all existing files using the `-o` or `--overwrite` flag. There is currently no way to add new highlights to an existing file without overwriting other files, too.
 
