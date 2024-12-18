@@ -47,8 +47,8 @@ class Highlight:
                 1. The book name
                 2. The highlight text
                 3. The location (e.g., location number)
-                4. The date of the highlight (if `add_date` is `True`)
-                5. The page number (if `add_page` is `True`)
+                4. The date of the highlight (if add_date is True)
+                5. The page number (if add_page is True)
             Will be all empty strings if the highlight string is not in the expected format.
         """
         split_string = list(filter(None, highlight_string.split("\n")))
@@ -71,8 +71,18 @@ class Highlight:
         # Parse additional info
         date_pieces = details[-1][10:].split(" ")
         date = " ".join(date_pieces[:4])
-        page_idx = details[0].strip().find("page")
-        page = "P" + details[0][page_idx + 1 : -1]
+        
+        # Try to get the page or location
+        details_text = details[0].strip()
+        page_idx = details_text.find("page")
+        location_idx = details_text.find("Location")
+        
+        if page_idx != -1:
+            page = details_text[page_idx:]
+        elif location_idx != -1:
+            page = details_text[location_idx:]
+        else:
+            page = ""
 
         return title, author, content, date, page
 
@@ -86,7 +96,7 @@ class Formatting(Enum):
     """
 
     # If you want to implement more formatting options, add them here.
-    # Then, update the `format_highlight` method to handle the new option.
+    # Then, update the format_highlight method to handle the new option.
     BULLET = "bullet"
     QUOTE = "quote"
     PARAGRAPH = "paragraph"
@@ -101,8 +111,8 @@ class Formatting(Enum):
 
         Args:
             highlight (str): The highlight text to be formatted.
-            add_date (bool, optional): Whether to add the date the highlight was made. Defaults to `True`.
-            add_page (bool, optional): Whether to add the page number of the highlight. Defaults to `True`.
+            add_date (bool, optional): Whether to add the date the highlight was made. Defaults to True.
+            add_page (bool, optional): Whether to add the page number of the highlight. Defaults to True.
 
         Returns:
             str: The formatted highlight text.
@@ -119,14 +129,10 @@ class Formatting(Enum):
             case _:
                 raise ValueError(f"Invalid formatting option: {self.value}")
 
-        if add_date and add_page:
-            formatted_text = (
-                f"{formatted_text} (Added on {highlight.date} - {highlight.page})"
-            )
-        elif add_date and not add_page:
-            formatted_text = f"{formatted_text} (Added on {highlight.date})"
-        elif not add_date and add_page:
+        # Only add page/location if add_page is True
+        if add_page and highlight.page:
             formatted_text = f"{formatted_text} ({highlight.page})"
+        
         return formatted_text + "\n"
 
 
@@ -137,12 +143,12 @@ class Parser:
         self.books: Dict[Tuple[str, str], List[Highlight]] = defaultdict(list)
 
     def parse_highlights(self, file_name=FILE_NAME):
-        """This method reads the contents of the provided Kindle highlights file, parses the data, and and stores the resulting `Highlight` objects in the `self.books` attribute of the class.
+        """This method reads the contents of the provided Kindle highlights file, parses the data, and and stores the resulting Highlight objects in the self.books attribute of the class.
 
         Args:
-            file_name (str, optional): The path to the Kindle highlights file. Defaults to `FILE_NAME`.
+            file_name (str, optional): The path to the Kindle highlights file. Defaults to FILE_NAME.
         """
-        with open(file_name, "r") as file:
+        with open(file_name, "r", encoding="utf-8") as file:
             data = file.read()
         highlights = data.split(HIGHLIGHT_SEPARATOR)
         for raw_string in highlights:
@@ -158,14 +164,14 @@ class Parser:
         add_page=True,
         overwrite=False,
     ):
-        """Write the parsed highlights to markdown files. Creates the folder `save_path` if it doesn't exist.
+        """Write the parsed highlights to markdown files. Creates the folder save_path if it doesn't exist.
 
         Args:
-            save_path (str, optional): The path to save the markdown files. Defaults to `SAVE_PATH`.
-            formatting (Formatting, optional): The output format for the highlights. Defaults to `Formatting.BULLET`.
-            add_date (bool, optional): Whether to add the date the highlight was made. Defaults to `True`.
-            add_page (bool, optional): Whether to add the page number of the highlight. Defaults to `True`.
-            overwrite (bool, optional): Whether to overwrite existing files. Defaults to `False`.
+            save_path (str, optional): The path to save the markdown files. Defaults to SAVE_PATH.
+            formatting (Formatting, optional): The output format for the highlights. Defaults to Formatting.BULLET.
+            add_date (bool, optional): Whether to add the date the highlight was made. Defaults to True.
+            add_page (bool, optional): Whether to add the page number of the highlight. Defaults to True.
+            overwrite (bool, optional): Whether to overwrite existing files. Defaults to False.
         """
         # Create the directory if it doesn't exist
         Path(save_path).mkdir(exist_ok=True)
@@ -178,19 +184,23 @@ class Parser:
             clean_author = "".join(
                 [c for c in author if c.isalpha() or c.isdigit() or c == " "]
             ).rstrip()
-            if (
-                not overwrite
-                and Path(f"{save_path}{clean_author}_{clean_title}.md").exists()
-            ):
-                print(
-                    f"- Skipping {clean_author}_{clean_title}.md as it already exists."
-                )
+
+            # Get the first highlight's date
+            first_highlight_date = highlights[0].date if highlights and add_date else ""
+
+            file_path = f"{save_path}{clean_author}_{clean_title}.md"
+            if not overwrite and Path(file_path).exists():
+                print(f"- Skipping {clean_author}_{clean_title}.md as it already exists.")
                 continue
-            with open(f"{save_path}{clean_author}_{clean_title}.md", "w") as file:
-                file.write(f"# {clean_title}\n")
+
+            with open(file_path, "w", encoding="utf-8") as file:
+                # Add date to the title if it exists
+                title_with_date = f"# {clean_title} {f'({first_highlight_date})' if first_highlight_date else ''}"
+                file.write(title_with_date + "\n")
                 file.write("\n")
                 file.write(f"Author: {clean_author}\n")
                 file.write("\n")
+                
                 for h in highlights:
                     formatted_text = formatting.format_highlight(h, add_date, add_page)
                     file.write(formatted_text)
@@ -218,13 +228,13 @@ if __name__ == "__main__":
         "-d",
         "--date",
         action="store_true",
-        help="Add the date the highlight was made to the output.",
+        help="Add the first highlight's date next to the book title.",
     )
     arg_parser.add_argument(
         "-p",
         "--page",
         action="store_true",
-        help="Add the page number of the highlight to the output.",
+        help="Add the page number/location of the highlight to the output.",
     )
     arg_parser.add_argument(
         "-o",
